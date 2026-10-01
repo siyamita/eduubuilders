@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EduBuilder — Platform Pendidikan Guru & Siswa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ================================================================
+   DESIGN TOKENS — tema ungu (purple), lebih "SaaS modern" dibanding
+   versi sebelumnya. Poppins untuk judul, Inter untuk isi/UI.
+   ================================================================ */
+:root{
+  --bg:#F6F4FC;
+  --surface:#FFFFFF;
+  --ink:#241B35;
+  --ink-soft:#5B4F74;
+  --muted:#7C7094;
+  --muted-2:#9890AD;
+  --primary:#6C3FC5;
+  --primary-dark:#5630A0;
+  --primary-soft:#EEE7FB;
+  --accent:#F2B84B;
+  --border:#E3DBF5;
+  --danger:#D14B4B;
+  --danger-soft:#FBEAEA;
+  --success:#2F9E6E;
+  --success-soft:#E6F5EE;
+  --sidebar-w:244px;
+}
+*{ box-sizing:border-box; }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; }
+h1,h2,h3,.font-head{ font-family:'Poppins',sans-serif; margin:0; }
+button{ font-family:inherit; }
+a{ color:inherit; }
+::-webkit-scrollbar{ width:8px; height:8px; }
+::-webkit-scrollbar-thumb{ background:#D7CCF0; border-radius:4px; }
+
+/* ---------- utility ---------- */
+.btn{
+  display:inline-flex; align-items:center; gap:6px;
+  border:none; border-radius:9px; padding:9px 16px;
+  font-size:13.5px; font-weight:600; cursor:pointer; transition:.15s;
+}
+.btn-primary{ background:var(--primary); color:#fff; }
+.btn-primary:hover{ background:var(--primary-dark); }
+.btn-outline{ background:#fff; color:var(--primary); border:1px solid var(--border); }
+.btn-outline:hover{ border-color:var(--primary); }
+.btn-danger{ background:var(--danger-soft); color:var(--danger); }
+.btn-danger:hover{ background:#f5d9d9; }
+.btn-success{ background:var(--success-soft); color:var(--success); }
+.btn-success:hover{ background:#d5efe2; }
+.btn-ghost{ background:transparent; color:var(--ink-soft); padding:6px 10px; }
+.btn-sm{ padding:6px 11px; font-size:12.5px; border-radius:7px; }
+.btn:disabled{ opacity:.45; cursor:not-allowed; }
+.card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:20px; }
+.badge{ display:inline-block; padding:3px 10px; border-radius:999px; font-size:11.5px; font-weight:600; }
+.badge-draft{ background:#FDF0DC; color:#A9731A; }
+.badge-published{ background:var(--success-soft); color:var(--success); }
+.input, textarea, select{
+  width:100%; border:1px solid var(--border); border-radius:8px; padding:9px 11px;
+  font-size:13.5px; font-family:inherit; outline:none; background:#fff; color:var(--ink);
+}
+.input:focus, textarea:focus, select:focus{ border-color:var(--primary); }
+label.field-label{ font-size:12px; font-weight:600; color:var(--ink-soft); display:block; margin-bottom:5px; }
+.field{ margin-bottom:14px; }
+.row-2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.section-title{ font-size:19px; margin-bottom:4px; }
+.section-desc{ color:var(--muted); font-size:13.5px; margin-bottom:20px; }
+.empty-note{ color:var(--muted-2); font-size:13.5px; padding:18px 0; }
+.table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+.table th{ text-align:left; color:var(--muted); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.03em; padding:8px 10px; border-bottom:1px solid var(--border); }
+.table td{ padding:10px; border-bottom:1px solid #F1ECFA; vertical-align:top; }
+.tabs-mini{ display:flex; gap:4px; border-bottom:1px solid var(--border); margin-bottom:20px; }
+.tabs-mini button{ background:none; border:none; padding:10px 6px; margin-right:20px; font-weight:600; font-size:13.5px; color:var(--muted); border-bottom:2px solid transparent; cursor:pointer; }
+.tabs-mini button.active{ color:var(--primary); border-bottom-color:var(--primary); }
+
+/* ---------- LOGIN ---------- */
+#login-screen{
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  background: radial-gradient(circle at 20% 20%, #EDE4FC, var(--bg) 60%);
+  padding:24px;
+}
+.login-card{ width:100%; max-width:860px; background:#fff; border-radius:20px; box-shadow:0 20px 50px rgba(108,63,197,.12); display:grid; grid-template-columns:1fr 1fr; overflow:hidden; }
+.login-art{ background:linear-gradient(160deg, var(--primary), #8A5FDC); color:#fff; padding:40px; display:flex; flex-direction:column; justify-content:space-between; }
+.login-art h1{ font-size:26px; line-height:1.3; }
+.login-art p{ color:#E6DBFB; font-size:13.5px; margin-top:10px; }
+.login-form{ padding:40px; }
+.role-pick{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:16px 0 20px; }
+.role-opt{ border:1.5px solid var(--border); border-radius:12px; padding:16px 12px; text-align:center; cursor:pointer; transition:.15s; }
+.role-opt:hover{ border-color:var(--primary); }
+.role-opt.active{ border-color:var(--primary); background:var(--primary-soft); }
+.role-opt .emoji{ font-size:26px; }
+.role-opt .name{ font-weight:600; font-size:13.5px; margin-top:6px; }
+
+/* ---------- APP SHELL ---------- */
+#app-screen{ display:none; min-height:100vh; }
+.sidebar{
+  position:fixed; top:0; left:0; bottom:0; width:var(--sidebar-w);
+  background:var(--primary); color:#fff; padding:24px 16px; display:flex; flex-direction:column;
+}
+.sidebar .brand{ font-family:'Poppins',sans-serif; font-weight:700; font-size:19px; padding:0 8px 24px; }
+.sidebar .brand span{ color:var(--accent); }
+.nav-item{
+  display:flex; align-items:center; gap:10px; padding:11px 12px; border-radius:9px;
+  color:#E6DBFB; font-size:13.5px; font-weight:500; cursor:pointer; margin-bottom:2px;
+}
+.nav-item:hover{ background:rgba(255,255,255,.08); color:#fff; }
+.nav-item.active{ background:rgba(255,255,255,.16); color:#fff; }
+.sidebar-foot{ margin-top:auto; border-top:1px solid rgba(255,255,255,.18); padding-top:14px; }
+.role-pill{ font-size:11px; background:rgba(255,255,255,.16); display:inline-block; padding:2px 9px; border-radius:999px; margin-bottom:8px; }
+
+.main{ margin-left:var(--sidebar-w); min-height:100vh; }
+.topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 32px; background:#fff; border-bottom:1px solid var(--border);
+}
+.content{ padding:28px 32px 60px; max-width:1080px; }
+
+/* ---------- Dashboard ---------- */
+.stat-grid{ display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); margin-top:22px; }
+.stat-card{ background:#fff; border:1px solid var(--border); border-radius:14px; padding:20px; cursor:pointer; transition:.15s; position:relative; overflow:hidden; }
+.stat-card:hover{ transform:translateY(-2px); box-shadow:0 10px 24px rgba(108,63,197,.1); }
+.stat-card .ic{ width:42px; height:42px; border-radius:10px; background:var(--primary-soft); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:19px; }
+.stat-card h3{ font-size:15.5px; margin-top:14px; }
+.stat-card p{ font-size:12.5px; color:var(--muted); margin-top:3px; }
+.stat-card .num{ font-size:23px; font-weight:700; color:var(--primary); margin-top:14px; }
+
+/* ---------- Materi / PPT list items ---------- */
+.list-item{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 16px; border:1px solid var(--border); border-radius:12px; margin-bottom:10px; background:#fff; }
+.list-item .meta{ display:flex; gap:12px; align-items:flex-start; }
+.list-item .ico{ width:38px; height:38px; border-radius:9px; background:var(--primary-soft); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0; }
+.list-item .title{ font-weight:600; font-size:14px; }
+.list-item .sub{ font-size:12px; color:var(--muted); margin-top:2px; }
+.list-item .actions{ display:flex; gap:8px; flex-shrink:0; }
+
+/* ---------- Soal builder ---------- */
+.opsi-row{ display:flex; align-items:center; gap:8px; border:1px solid var(--border); border-radius:8px; padding:7px 9px; margin-bottom:7px; background:#fff; cursor:grab; }
+.opsi-row.dragging{ opacity:.4; }
+.opsi-row .handle{ color:var(--muted-2); font-size:14px; }
+.opsi-row input[type=text]{ border:none; outline:none; flex:1; font-size:13.5px; }
+.opsi-row input[type=radio]{ accent-color:var(--primary); }
+
+/* ---------- Modul Ajar preview (meniru format Word yang diupload) ---------- */
+.doc-preview{ background:#fff; border:1px solid var(--border); border-radius:12px; padding:36px 42px; font-family:'Times New Roman',serif; color:#1a1a1a; }
+.doc-preview h2{ font-family:'Times New Roman',serif; text-align:center; font-size:18px; margin:0; }
+.doc-preview .sub{ text-align:center; font-size:14px; margin-top:4px; }
+.doc-preview h4{ font-family:'Times New Roman',serif; font-size:14.5px; margin:20px 0 6px; border-bottom:1px solid #ccc; padding-bottom:3px; }
+.doc-preview p, .doc-preview li{ font-size:13.5px; line-height:1.6; }
+.doc-preview table{ width:100%; border-collapse:collapse; margin:8px 0 4px; }
+.doc-preview table td, .doc-preview table th{ border:1px solid #999; padding:5px 8px; font-size:13px; }
+
+/* ---------- Flash card flip ---------- */
+.fc-grid{ display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); margin-top:18px; }
+.fc-scene{ height:150px; position:relative; }
+.fc-scene .del{ position:absolute; top:-8px; right:-8px; z-index:2; width:22px; height:22px; border-radius:50%; background:var(--danger); color:#fff; border:none; display:none; align-items:center; justify-content:center; cursor:pointer; font-size:11px; }
+.fc-scene:hover .del{ display:flex; }
+.flip-scene{ perspective:1100px; height:100%; width:100%; cursor:pointer; }
+.flip-inner{ position:relative; width:100%; height:100%; transition:transform .55s; transform-style:preserve-3d; }
+.flip-scene.is-flipped .flip-inner{ transform:rotateY(180deg); }
+.flip-face{ position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:12px; display:flex; align-items:center; justify-content:center; text-align:center; padding:14px; font-size:13.5px; }
+.flip-face.front{ background:#fff; border:1px solid var(--border); font-weight:600; }
+.flip-face.back{ background:var(--primary); color:#fff; transform:rotateY(180deg); }
+
+/* ---------- Quiz player (siswa) ---------- */
+.quiz-q{ border:1px solid var(--border); border-radius:12px; padding:16px 18px; margin-bottom:14px; background:#fff; }
+.quiz-opt{ display:flex; align-items:center; gap:8px; padding:8px 10px; border:1px solid var(--border); border-radius:8px; margin-bottom:6px; cursor:pointer; font-size:13.5px; }
+.quiz-opt:hover{ border-color:var(--primary); }
+.quiz-opt input{ accent-color:var(--primary); }
+
+/* ---------- misc ---------- */
+.modal-overlay{ position:fixed; inset:0; background:rgba(36,27,53,.45); display:flex; align-items:center; justify-content:center; z-index:50; padding:20px; }
+.modal-box{ background:#fff; border-radius:14px; padding:24px; width:100%; max-width:480px; max-height:90vh; overflow-y:auto; }
+#toast{ position:fixed; bottom:22px; left:50%; transform:translateX(-50%); background:var(--ink); color:#fff; padding:11px 20px; border-radius:999px; font-size:13px; opacity:0; pointer-events:none; transition:opacity .25s; z-index:100; }
+#toast.show{ opacity:1; }
+.link-note{ font-size:12.5px; color:var(--primary); font-weight:600; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN SCREEN ================= -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-art">
+      <div>
+        <div class="font-head" style="font-size:19px; font-weight:700;">Edu<span style="color:#F2B84B;">Builder</span></div>
+        <h1 style="margin-top:60px;">Satu platform untuk mengajar & belajar lebih mudah.</h1>
+        <p>Guru menyiapkan modul, materi, presentasi, evaluasi, dan flash card — siswa mengaksesnya kapan saja.</p>
+      </div>
+      <p style="font-size:12px; color:#D9CBF5;">© 2026 EduBuilder — Demo Prototipe</p>
+    </div>
+    <div class="login-form">
+      <h2 class="section-title">Masuk ke akun Anda</h2>
+      <p class="section-desc">Pilih peran Anda untuk melanjutkan.</p>
+
+      <div class="role-pick" id="role-pick">
+        <div class="role-opt active" data-role="guru">
+          <div class="emoji">🧑‍🏫</div>
+          <div class="name">Guru</div>
+        </div>
+        <div class="role-opt" data-role="siswa">
+          <div class="emoji">🎒</div>
+          <div class="name">Siswa</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Nama Lengkap</label>
+        <input class="input" id="login-name" placeholder="Masukkan nama Anda" />
+      </div>
+      <button class="btn btn-primary" style="width:100%; justify-content:center; padding:11px;" id="btn-login">Masuk</button>
+      <p style="font-size:11.5px; color:var(--muted-2); margin-top:12px;">Demo prototipe — tidak memerlukan kata sandi.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ================= APP SCREEN ================= -->
+<div id="app-screen">
+  <aside class="sidebar">
+    <div class="brand">Edu<span>Builder</span></div>
+    <nav id="sidebar-nav"></nav>
+    <div class="sidebar-foot">
+      <span class="role-pill" id="role-pill"></span>
+      <div id="user-name" style="font-size:13.5px; font-weight:600;"></div>
+      <div class="nav-item" style="margin-top:10px; padding-left:0;" id="btn-logout">🚪 Keluar</div>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <div id="topbar-title" class="font-head" style="font-size:17px;"></div>
+      <div style="font-size:13px; color:var(--muted);" id="topbar-sub"></div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ================================================================
+   STATE — seluruh "database" demo ini disimpan di memori (JS object).
+   Tidak ada server sungguhan; refresh halaman akan mengembalikan ke
+   data awal. Untuk produksi, ganti seluruh fungsi `state.*` di bawah
+   dengan pemanggilan API sungguhan (lihat file-file backend terpisah
+   yang sudah dibuat sebelumnya: rpp_route.ts, dst — pola yang sama
+   bisa dipakai untuk materi/ppt/soal/flashcard).
+   ================================================================ */
+let _id = 100;
+const nid = () => ++_id;
+const today = () => new Date().toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' });
+
+const state = {
+  screen: 'login',          // 'login' | 'app'
+  role: null,                // 'guru' | 'siswa'
+  userName: '',
+  loginRolePick: 'guru',
+  activeMenu: 'dashboard',
+
+  materiList: [
+    { id:1, judul:'Jurnal Umum — Dasar Akuntansi', mapel:'Akuntansi', tipe:'Dokumen', fileName:'jurnal-umum.pdf', url:null, tanggal:'28 Sep 2026' },
+    { id:2, judul:'Video Pengantar Debit & Kredit', mapel:'Akuntansi', tipe:'Video', fileName:'debit-kredit.mp4', url:null, tanggal:'26 Sep 2026' },
+    { id:3, judul:'Contoh Soal Jurnal Umum (YouTube)', mapel:'Akuntansi', tipe:'Video (Link)', fileName:'https://youtube.com/watch?v=contoh', url:'https://youtube.com/watch?v=contoh', tanggal:'24 Sep 2026' },
+  ],
+  pptList: [
+    { id:1, judul:'Presentasi — Jurnal Umum', materiId:1, status:'published', tanggal:'29 Sep 2026' },
+  ],
+  modulList: [],
+
+  soalBank: [
+    { id:1, tipe:'PG', pertanyaan:'Akun yang bertambah dicatat di sisi Debit adalah...', opsi:[{id:'o1',teks:'Kas'},{id:'o2',teks:'Utang'},{id:'o3',teks:'Modal'},{id:'o4',teks:'Pendapatan'}], kunci:'o1', poin:10 },
+    { id:2, tipe:'BS', pertanyaan:'Setiap transaksi harus dicatat pada minimal dua akun.', opsi:null, kunci:'benar', poin:10 },
+  ],
+  rekapNilai: [
+    { nama:'Rina Oktaviani', nilai:90, tanggal:'29 Sep 2026' },
+  ],
+
+  flashcardDecks: [
+    { id:1, judul:'Jurnal Umum — Istilah Dasar', cards:[
+      { depan:'Debit', belakang:'Posisi pencatatan saat Harta/Beban bertambah' },
+      { depan:'Kredit', belakang:'Posisi pencatatan saat Utang/Modal/Pendapatan bertambah' },
+    ]},
+  ],
+
+  // --- transient (builder) state untuk form yang sedang dikerjakan ---
+  builder: {
+    materiMode: 'file',
+    materiForm: { judul:'', mapel:'', file:null },
+    pptMode: 'materi',
+    pptForm: { materiId: null, file:null, judul:'' },
+    modul: defaultModulForm(),
+    modulPreviewHtml: null,
+    soalForm: { tipe:'PG', pertanyaan:'', opsi:[{id:'n1',teks:''},{id:'n2',teks:''}], kunci:null, poin:10 },
+    aiMateriId: null,
+    activeDeckId: null,
+    deckNewTitle: '',
+    cardForm: { depan:'', belakang:'' },
+    quizAnswers: {},
+    quizSubmitted: null, // {skor, maksimal}
+  },
+};
+
+function defaultModulForm(){
+  return {
+    mapel:'', fase:'', alokasi:'', target:'', model:'', moda:'',
+    kompetensiAwal:'', tujuan:'', pemahaman:'', pertanyaanPemantik:'',
+    materiInti:'', kegiatanPembuka:'', kegiatanInti:'', kegiatanPenutup:'',
+    asesmen:'', remedialPengayaan:'',
+  };
+}
+
+const MENU = {
+  guru:  [
+    { key:'dashboard', label:'Dashboard', icon:'🏠' },
+    { key:'modul', label:'Generator Modul Ajar', icon:'📘' },
+    { key:'materi', label:'Materi Pembelajaran', icon:'📂' },
+    { key:'ppt', label:'Power Point', icon:'🖥️' },
+    { key:'evaluasi', label:'Evaluasi', icon:'✅' },
+    { key:'flashcard', label:'Flash Card', icon:'🗂️' },
+  ],
+  siswa: [
+    { key:'dashboard', label:'Dashboard', icon:'🏠' },
+    { key:'modul', label:'Modul Ajar', icon:'📘' },
+    { key:'materi', label:'Materi Pembelajaran', icon:'📂' },
+    { key:'ppt', label:'Power Point', icon:'🖥️' },
+    { key:'evaluasi', label:'Evaluasi', icon:'✅' },
+    { key:'flashcard', label:'Flash Card', icon:'🗂️' },
+  ],
+};
+
+function showToast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+/* ================================================================
+   RENDER — dipanggil ulang tiap ada perubahan state. Pendekatan ini
+   sengaja dibuat sederhana (bukan framework reaktif) agar satu file
+   HTML ini tetap mudah dibaca & ditempel ke proyek lain.
+   ================================================================ */
+function render(){
+  document.getElementById('login-screen').style.display = state.screen === 'login' ? 'flex' : 'none';
+  document.getElementById('app-screen').style.display = state.screen === 'app' ? 'flex' : 'none';
+  if(state.screen !== 'app') return;
+
+  document.getElementById('role-pill').textContent = state.role === 'guru' ? 'GURU' : 'SISWA';
+  document.getElementById('user-name').textContent = state.userName;
+
+  const nav = document.getElementById('sidebar-nav');
+  nav.innerHTML = MENU[state.role].map(m => `
+    <div class="nav-item ${state.activeMenu === m.key ? 'active' : ''}" data-action="goto" data-menu="${m.key}">
+      <span>${m.icon}</span><span>${m.label}</span>
+    </div>`).join('');
+
+  const current = MENU[state.role].find(m => m.key === state.activeMenu);
+  document.getElementById('topbar-title').textContent = current ? current.label : '';
+  document.getElementById('topbar-sub').textContent = state.role === 'guru' ? 'Mode Guru' : 'Mode Siswa';
+
+  const renderers = {
+    dashboard: renderDashboard, modul: renderModul, materi: renderMateri,
+    ppt: renderPpt, evaluasi: renderEvaluasi, flashcard: renderFlashcard,
+  };
+  document.getElementById('content').innerHTML = renderers[state.activeMenu]();
+}
+
+/* ---------------- DASHBOARD ---------------- */
+function renderDashboard(){
+  const publishedModul = state.modulList.filter(m => m.status === 'published').length;
+  const publishedPpt = state.pptList.filter(p => p.status === 'published').length;
+  const cards = state.role === 'guru' ? [
+    { menu:'modul', icon:'📘', title:'Generator Modul Ajar', sub:'Susun modul ajar siap unduh', num:state.modulList.length, unit:'modul dibuat' },
+    { menu:'materi', icon:'📂', title:'Materi Pembelajaran', sub:'Upload materi & video ajar', num:state.materiList.length, unit:'file tersimpan' },
+    { menu:'ppt', icon:'🖥️', title:'Power Point', sub:'Generate & kelola presentasi', num:state.pptList.length, unit:'presentasi' },
+    { menu:'evaluasi', icon:'✅', title:'Evaluasi', sub:'Bank soal & rekap nilai siswa', num:state.soalBank.length, unit:'soal tersimpan' },
+    { menu:'flashcard', icon:'🗂️', title:'Flash Card', sub:'Kelola deck flash card', num:state.flashcardDecks.length, unit:'deck tersimpan' },
+  ] : [
+    { menu:'modul', icon:'📘', title:'Modul Ajar', sub:'Modul yang dibagikan guru', num:publishedModul, unit:'modul tersedia' },
+    { menu:'materi', icon:'📂', title:'Materi Pembelajaran', sub:'Dokumen & video dari guru', num:state.materiList.length, unit:'file tersedia' },
+    { menu:'ppt', icon:'🖥️', title:'Power Point', sub:'Presentasi dari guru', num:publishedPpt, unit:'presentasi tersedia' },
+    { menu:'evaluasi', icon:'✅', title:'Evaluasi', sub:'Kerjakan evaluasi & lihat nilai', num:state.soalBank.length, unit:'soal tersedia' },
+    { menu:'flashcard', icon:'🗂️', title:'Flash Card', sub:'Belajar dengan kartu interaktif', num:state.flashcardDecks.length, unit:'deck tersedia' },
+  ];
+
+  return `
+    <p style="color:var(--muted); font-size:13.5px;">Selamat datang kembali,</p>
+    <h1 class="font-head" style="font-size:27px; margin-top:2px;">${escapeHtml(state.userName)}</h1>
+    <p style="color:var(--ink-soft); max-width:520px; margin-top:8px; font-size:13.5px;">
+      ${state.role === 'guru' ? 'Kelola seluruh materi mengajar dan pantau perkembangan belajar siswa Anda.' : 'Akses modul, materi, presentasi, flash card, dan evaluasi yang dibagikan guru Anda.'}
+    </p>
+    <div class="stat-grid">
+      ${cards.map(c => `
+        <div class="stat-card" data-action="goto" data-menu="${c.menu}">
+          <div class="ic">${c.icon}</div>
+          <h3>${c.title}</h3>
+          <p>${c.sub}</p>
+          <div class="num">${c.num} <span style="font-size:12.5px; font-weight:500; color:var(--muted-2);">${c.unit}</span></div>
+        </div>`).join('')}
+    </div>`;
+}
+
+/* ---------------- MATERI PEMBELAJARAN ---------------- */
+function renderMateri(){
+  const isGuru = state.role === 'guru';
+  const materiMode = state.builder.materiMode;
+  const uploadForm = !isGuru ? '' : `
+    <div class="card" style="margin-bottom:22px;">
+      <h3 class="section-title">Tambah Materi Baru</h3>
+      <p class="section-desc">Unggah file dari perangkat, atau sisipkan link (YouTube, Google Drive, situs lain) untuk dibagikan ke siswa.</p>
+
+      <div class="tabs-mini">
+        <button class="${materiMode === 'file' ? 'active' : ''}" data-action="materi-mode" data-mode="file">⬆ Upload File</button>
+        <button class="${materiMode === 'link' ? 'active' : ''}" data-action="materi-mode" data-mode="link">🔗 Tambahkan Link</button>
+      </div>
+
+      <div class="row-2">
+        <div class="field">
+          <label class="field-label">Judul Materi</label>
+          <input class="input" id="materi-judul" placeholder="contoh: Bab 2 - Persamaan Dasar Akuntansi" />
+        </div>
+        <div class="field">
+          <label class="field-label">Mata Pelajaran</label>
+          <input class="input" id="materi-mapel" placeholder="contoh: Akuntansi" />
+        </div>
+      </div>
+
+      ${materiMode === 'file' ? `
+        <div class="field">
+          <label class="field-label">File (dokumen / video)</label>
+          <input class="input" type="file" id="materi-file" />
+        </div>` : `
+        <div class="field">
+          <label class="field-label">Link Materi (URL)</label>
+          <input class="input" type="url" id="materi-link" placeholder="contoh: https://youtube.com/watch?v=... atau https://drive.google.com/..." />
+          <p style="font-size:11.5px; color:var(--muted-2); margin-top:5px;">Cocok untuk video YouTube, dokumen Google Drive, atau sumber belajar eksternal lainnya.</p>
+        </div>`}
+
+      <button class="btn btn-primary" data-action="upload-materi">${materiMode === 'file' ? '⬆ Upload Materi' : '🔗 Simpan Link Materi'}</button>
+    </div>`;
+
+  const items = state.materiList.map(m => {
+    const linkedPpt = state.pptList.find(p => p.materiId === m.id);
+    const isLink = m.tipe === 'Link' || m.tipe === 'Video (Link)';
+    const icon = m.tipe === 'Video' ? '🎬' : m.tipe === 'Video (Link)' ? '▶️' : isLink ? '🔗' : '📄';
+    return `
+      <div class="list-item">
+        <div class="meta">
+          <div class="ico">${icon}</div>
+          <div>
+            <div class="title">${escapeHtml(m.judul)}</div>
+            <div class="sub">${escapeHtml(m.mapel)} · ${isLink ? escapeHtml(m.url) : escapeHtml(m.fileName)} · ${isLink ? 'ditambahkan' : 'diunggah'} ${m.tanggal}</div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-outline btn-sm" data-action="open-file" data-url="${m.url || ''}" data-name="${escapeHtml(m.fileName || '')}">${isLink ? 'Buka Link ↗' : 'Lihat / Unduh'}</button>
+          ${isGuru ? (linkedPpt
+            ? `<span class="link-note" data-action="goto" data-menu="ppt">Lihat di menu PowerPoint →</span>`
+            : `<button class="btn btn-outline btn-sm" data-action="generate-ppt-from-materi" data-id="${m.id}">Generate ke PowerPoint</button>`)
+            : ''}
+          ${isGuru ? `<button class="btn btn-danger btn-sm" data-action="hapus-materi" data-id="${m.id}">Hapus</button>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+
+  return `
+    <h2 class="section-title">Materi Pembelajaran</h2>
+    <p class="section-desc">${isGuru ? 'Unggah dokumen & video, lalu generate ke PowerPoint bila diperlukan.' : 'Semua dokumen dan video yang telah dibagikan guru Anda.'}</p>
+    ${uploadForm}
+    ${items || '<p class="empty-note">Belum ada materi yang diunggah.</p>'}`;
+}
+
+/* ---------------- POWER POINT ---------------- */
+function renderPpt(){
+  const isGuru = state.role === 'guru';
+  const b = state.builder;
+
+  const generateForm = !isGuru ? '' : `
+    <div class="card" style="margin-bottom:22px;">
+      <h3 class="section-title">Generate PowerPoint Baru</h3>
+      <p class="section-desc">Pilih sumber materi untuk dibuatkan presentasi otomatis.</p>
+
+      <div class="tabs-mini">
+        <button class="${b.pptMode === 'materi' ? 'active' : ''}" data-action="ppt-mode" data-mode="materi">Dari Materi Tersimpan</button>
+        <button class="${b.pptMode === 'upload' ? 'active' : ''}" data-action="ppt-mode" data-mode="upload">Upload Materi Baru</button>
+      </div>
+
+      ${b.pptMode === 'materi' ? `
+        <div class="field">
+          <label class="field-label">Pilih Materi</label>
+          <select class="input" id="ppt-materi-select">
+            <option value="">— pilih materi —</option>
+            ${state.materiList.map(m => `<option value="${m.id}">${escapeHtml(m.judul)}</option>`).join('')}
+          </select>
+        </div>` : `
+        <div class="field">
+          <label class="field-label">Judul Presentasi</label>
+          <input class="input" id="ppt-upload-judul" placeholder="contoh: Presentasi Bab 3" />
+        </div>
+        <div class="field">
+          <label class="field-label">Upload Materi dari Luar Sistem</label>
+          <input class="input" type="file" id="ppt-upload-file" />
+        </div>`}
+
+      <button class="btn btn-primary" data-action="generate-ppt">✨ Generate Sekarang</button>
+    </div>`;
+
+  const manageList = state.pptList.map(p => {
+    const sumber = p.materiId ? (state.materiList.find(m => m.id === p.materiId)?.judul || 'Materi terhapus') : 'Upload eksternal';
+    return `
+      <div class="list-item">
+        <div class="meta">
+          <div class="ico">🖥️</div>
+          <div>
+            <div class="title">${escapeHtml(p.judul)}</div>
+            <div class="sub">Sumber: ${escapeHtml(sumber)} · dibuat ${p.tanggal}
+              <span class="badge ${p.status === 'published' ? 'badge-published' : 'badge-draft'}" style="margin-left:6px;">${p.status === 'published' ? 'Terbit ke Siswa' : 'Draft'}</span>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-outline btn-sm" data-action="open-file" data-url="" data-name="${escapeHtml(p.judul)}.pptx">Lihat</button>
+          ${isGuru ? (p.status === 'published'
+            ? `<button class="btn btn-outline btn-sm" data-action="ppt-unpublish" data-id="${p.id}">Batalkan Upload</button>`
+            : `<button class="btn btn-success btn-sm" data-action="ppt-publish" data-id="${p.id}">Upload untuk Siswa</button>`) : ''}
+          ${isGuru ? `<button class="btn btn-danger btn-sm" data-action="hapus-ppt" data-id="${p.id}">Hapus</button>` : ''}
+        </div>
+      </div>`;
+  });
+
+  const visibleList = isGuru ? manageList : state.pptList.filter(p => p.status === 'published').map((p,i) => manageList[state.pptList.indexOf(p)]);
+
+  return `
+    <h2 class="section-title">Power Point</h2>
+    <p class="section-desc">${isGuru ? 'Generate presentasi dari materi, lalu kelola visibilitasnya ke siswa.' : 'Presentasi yang telah dibagikan guru Anda.'}</p>
+    ${generateForm}
+    ${isGuru ? '<h3 class="section-title" style="font-size:15.5px;">Kelola PowerPoint</h3>' : ''}
+    ${visibleList.join('') || '<p class="empty-note">Belum ada presentasi.</p>'}`;
+}
+
+/* ---------------- GENERATOR MODUL AJAR ---------------- */
+function renderModul(){
+  const isGuru = state.role === 'guru';
+  const b = state.builder;
+  const f = b.modul;
+
+  if(!isGuru){
+    const items = state.modulList.filter(m => m.status === 'published').map(m => `
+      <div class="list-item">
+        <div class="meta">
+          <div class="ico">📘</div>
+          <div>
+            <div class="title">${escapeHtml(m.data.mapel || 'Modul Ajar')}</div>
+            <div class="sub">Fase/Kelas ${escapeHtml(m.data.fase || '-')} · dibuat ${m.tanggal}</div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-outline btn-sm" data-action="download-modul" data-id="${m.id}">Unduh</button>
+        </div>
+      </div>`).join('');
+    return `
+      <h2 class="section-title">Modul Ajar</h2>
+      <p class="section-desc">Modul ajar yang telah dibagikan guru Anda.</p>
+      ${items || '<p class="empty-note">Belum ada modul ajar yang dibagikan.</p>'}`;
+  }
+
+  const field = (key, label, isTextarea=true, placeholder='') => `
+    <div class="field">
+      <label class="field-label">${label}</label>
+      ${isTextarea
+        ? `<textarea rows="3" id="mod-${key}" placeholder="${placeholder}">${escapeHtml(f[key])}</textarea>`
+        : `<input class="input" id="mod-${key}" value="${escapeHtml(f[key])}" placeholder="${placeholder}" />`}
+    </div>`;
+
+  return `
+    <h2 class="section-title">Generator Modul Ajar</h2>
+    <p class="section-desc">Isi tiap bagian di bawah, lalu klik <b>Generate</b> untuk melihat pratinjau modul ajar siap unduh.</p>
+
+    <div class="card">
+      <h3 class="section-title" style="font-size:15px;">A. Informasi Umum</h3>
+      <div class="row-2">
+        ${field('mapel','Mata Pelajaran', false)}
+        ${field('fase','Fase / Kelas', false)}
+      </div>
+      <div class="row-2">
+        ${field('alokasi','Alokasi Waktu', false, 'contoh: 2 x 45 menit')}
+        ${field('target','Target Peserta Didik', false)}
+      </div>
+      <div class="row-2">
+        ${field('model','Model Pembelajaran', false)}
+        ${field('moda','Moda Pembelajaran', false)}
+      </div>
+
+      <h3 class="section-title" style="font-size:15px; margin-top:8px;">B–F. Isi Modul</h3>
+      ${field('kompetensiAwal','B. Kompetensi Awal')}
+      ${field('tujuan','C. Tujuan Pembelajaran (satu baris = satu poin)')}
+      ${field('pemahaman','D. Pemahaman Bermakna')}
+      ${field('pertanyaanPemantik','E. Pertanyaan Pemantik (satu baris = satu poin)')}
+      ${field('materiInti','F. Materi Pembelajaran')}
+
+      <h3 class="section-title" style="font-size:15px; margin-top:8px;">G. Kegiatan Pembelajaran</h3>
+      ${field('kegiatanPembuka','Kegiatan Pendahuluan')}
+      ${field('kegiatanInti','Kegiatan Inti')}
+      ${field('kegiatanPenutup','Kegiatan Penutup')}
+
+      <h3 class="section-title" style="font-size:15px; margin-top:8px;">H–I. Penutup</h3>
+      ${field('asesmen','H. Asesmen')}
+      ${field('remedialPengayaan','I. Remedial & Pengayaan')}
+
+      <button class="btn btn-primary" data-action="generate-modul" style="margin-top:4px;">✨ Generate Modul Ajar</button>
+    </div>
+
+    ${b.modulPreviewHtml ? `
+      <h3 class="section-title" style="margin-top:28px;">Pratinjau Modul Ajar</h3>
+      <div class="doc-preview">${b.modulPreviewHtml}</div>
+      <div style="margin-top:14px; display:flex; gap:10px;">
+        <button class="btn btn-primary" data-action="download-modul-draft">⬇ Download sebagai Word (.doc)</button>
+        <button class="btn btn-success" data-action="simpan-publish-modul">📤 Simpan & Terbitkan ke Siswa</button>
+      </div>` : ''}
+
+    ${state.modulList.length ? `
+      <h3 class="section-title" style="margin-top:30px;">Modul Tersimpan</h3>
+      ${state.modulList.map(m => `
+        <div class="list-item">
+          <div class="meta">
+            <div class="ico">📘</div>
+            <div>
+              <div class="title">${escapeHtml(m.data.mapel || 'Modul Ajar')}</div>
+              <div class="sub">Fase/Kelas ${escapeHtml(m.data.fase || '-')} · dibuat ${m.tanggal}
+                <span class="badge ${m.status === 'published' ? 'badge-published' : 'badge-draft'}" style="margin-left:6px;">${m.status === 'published' ? 'Terbit ke Siswa' : 'Draft'}</span>
+              </div>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-outline btn-sm" data-action="download-modul" data-id="${m.id}">Unduh</button>
+            ${m.status === 'published'
+              ? `<button class="btn btn-outline btn-sm" data-action="unpublish-modul" data-id="${m.id}">Batalkan Terbit</button>`
+              : `<button class="btn btn-success btn-sm" data-action="publish-modul" data-id="${m.id}">Terbitkan</button>`}
+            <button class="btn btn-danger btn-sm" data-action="hapus-modul" data-id="${m.id}">Hapus</button>
+          </div>
+        </div>`).join('')}` : ''}`;
+}
+
+/* ---------------- EVALUASI ---------------- */
+function renderEvaluasi(){
+  const isGuru = state.role === 'guru';
+  if(isGuru) return renderEvaluasiGuru();
+  return renderEvaluasiSiswa();
+}
+
+function renderEvaluasiGuru(){
+  const b = state.builder;
+  const f = b.soalForm;
+  const tab = b.evalTab || 'soal';
+
+  const soalForm = `
+    <div class="card" style="margin-bottom:20px;">
+      <h3 class="section-title" style="font-size:15.5px;">Buat Soal Baru</h3>
+      <div class="row-2">
+        <div class="field">
+          <label class="field-label">Tipe Soal</label>
+          <select class="input" id="soal-tipe" data-action-onchange="soal-tipe-change">
+            <option value="PG" ${f.tipe==='PG'?'selected':''}>Pilihan Ganda</option>
+            <option value="ESAI" ${f.tipe==='ESAI'?'selected':''}>Esai</option>
+            <option value="BS" ${f.tipe==='BS'?'selected':''}>Benar / Salah</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label">Poin</label>
+          <input class="input" type="number" id="soal-poin" value="${f.poin}" />
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Pertanyaan</label>
+        <textarea rows="2" id="soal-pertanyaan" placeholder="Tulis pertanyaan di sini...">${escapeHtml(f.pertanyaan)}</textarea>
+      </div>
+
+      ${f.tipe === 'PG' ? `
+        <label class="field-label">Opsi Jawaban (geser ikon ⠿ untuk mengurutkan, pilih bulatan untuk kunci jawaban)</label>
+        <div id="opsi-list">${renderOpsiList()}</div>
+        <button class="btn btn-outline btn-sm" data-action="tambah-opsi" style="margin-top:4px;">+ Tambah Opsi</button>
+      ` : f.tipe === 'BS' ? `
+        <label class="field-label">Kunci Jawaban</label>
+        <div class="opsi-row" style="cursor:default;"><input type="radio" name="kunci-bs" ${f.kunci==='benar'?'checked':''} data-action="pilih-kunci-bs" value="benar" /> Benar</div>
+        <div class="opsi-row" style="cursor:default;"><input type="radio" name="kunci-bs" ${f.kunci==='salah'?'checked':''} data-action="pilih-kunci-bs" value="salah" /> Salah</div>
+      ` : `
+        <div class="field">
+          <label class="field-label">Kunci Jawaban / Jawaban Model (acuan penilaian manual)</label>
+          <textarea rows="2" id="soal-kunci-esai" placeholder="Tulis jawaban acuan...">${escapeHtml(f.kunci || '')}</textarea>
+        </div>`}
+
+      <button class="btn btn-primary" data-action="simpan-soal" style="margin-top:8px;">Simpan Soal</button>
+    </div>
+
+    <div class="card" style="margin-bottom:22px;">
+      <h3 class="section-title" style="font-size:15.5px;">Generate Soal dari Materi (AI)</h3>
+      <p class="section-desc">Hubungkan ke server AI untuk membuat soal otomatis dari materi yang sudah diunggah.</p>
+      <div class="row-2" style="align-items:end;">
+        <div class="field" style="margin-bottom:0;">
+          <select class="input" id="ai-materi-select">
+            <option value="">— pilih materi —</option>
+            ${state.materiList.map(m => `<option value="${m.id}">${escapeHtml(m.judul)}</option>`).join('')}
+          </select>
+        </div>
+        <button class="btn btn-outline" data-action="generate-soal-ai" style="height:fit-content;">🤖 Generate Soal</button>
+      </div>
+    </div>`;
+
+  const bankList = state.soalBank.map(s => `
+    <div class="list-item">
+      <div class="meta">
+        <div class="ico">${s.tipe === 'PG' ? '🔘' : s.tipe === 'BS' ? '⚖️' : '✍️'}</div>
+        <div>
+          <div class="title">${escapeHtml(s.pertanyaan)}</div>
+          <div class="sub">${s.tipe === 'PG' ? 'Pilihan Ganda' : s.tipe === 'BS' ? 'Benar / Salah' : 'Esai'} · ${s.poin} poin</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-danger btn-sm" data-action="hapus-soal" data-id="${s.id}">Hapus</button>
+      </div>
+    </div>`).join('');
+
+  const rekap = `
+    <table class="table">
+      <thead><tr><th>Nama Siswa</th><th>Nilai</th><th>Tanggal</th></tr></thead>
+      <tbody>
+        ${state.rekapNilai.map(r => `<tr><td>${escapeHtml(r.nama)}</td><td>${r.nilai}</td><td>${r.tanggal}</td></tr>`).join('') || '<tr><td colspan="3" class="empty-note">Belum ada siswa yang mengerjakan evaluasi.</td></tr>'}
+      </tbody>
+    </table>`;
+
+  return `
+    <h2 class="section-title">Evaluasi</h2>
+    <p class="section-desc">Kelola bank soal dan pantau hasil evaluasi siswa.</p>
+    <div class="tabs-mini">
+      <button class="${tab==='soal'?'active':''}" data-action="eval-tab" data-tab="soal">Bank Soal</button>
+      <button class="${tab==='rekap'?'active':''}" data-action="eval-tab" data-tab="rekap">Rekap Nilai</button>
+    </div>
+    ${tab === 'soal' ? soalForm + (bankList || '<p class="empty-note">Belum ada soal.</p>') : rekap}`;
+}
+
+function renderOpsiList(){
+  const f = state.builder.soalForm;
+  return f.opsi.map((o, idx) => `
+    <div class="opsi-row" draggable="true" data-opsi-id="${o.id}">
+      <span class="handle">⠿</span>
+      <input type="radio" name="kunci-pg" ${f.kunci===o.id?'checked':''} data-action="pilih-kunci-pg" value="${o.id}" />
+      <input type="text" value="${escapeHtml(o.teks)}" data-action-oninput="opsi-text" data-opsi-id="${o.id}" placeholder="Teks opsi ${idx+1}" />
+      ${f.opsi.length > 2 ? `<span class="btn-ghost" style="cursor:pointer;" data-action="hapus-opsi" data-opsi-id="${o.id}">✕</span>` : ''}
+    </div>`).join('');
+}
+
+function renderEvaluasiSiswa(){
+  const b = state.builder;
+  if(b.quizSubmitted){
+    const { skor, maksimal } = b.quizSubmitted;
+    return `
+      <h2 class="section-title">Hasil Evaluasi</h2>
+      <div class="card" style="text-align:center; padding:40px;">
+        <p style="color:var(--muted); font-size:13.5px;">Nilai Anda</p>
+        <div class="font-head" style="font-size:44px; color:var(--primary); margin-top:6px;">${skor}</div>
+        <p style="color:var(--muted); font-size:12.5px; margin-top:4px;">dari skala 100 (soal esai akan dinilai manual oleh guru)</p>
+        <button class="btn btn-outline" style="margin-top:18px;" data-action="ulangi-evaluasi">Kembali</button>
+      </div>`;
+  }
+
+  if(state.soalBank.length === 0){
+    return `<h2 class="section-title">Evaluasi</h2><p class="empty-note">Belum ada evaluasi yang dibagikan guru.</p>`;
+  }
+
+  if(!b.quizStarted){
+    const totalPoin = state.soalBank.reduce((t,s)=>t+s.poin,0);
+    return `
+      <h2 class="section-title">Evaluasi</h2>
+      <div class="card">
+        <h3 class="section-title" style="font-size:16px;">Evaluasi Tersedia</h3>
+        <p class="section-desc">${state.soalBank.length} soal · total ${totalPoin} poin</p>
+        <button class="btn btn-primary" data-action="mulai-evaluasi">Mulai Kerjakan</button>
+      </div>`;
+  }
+
+  const questions = state.soalBank.map((s, i) => {
+    let body = '';
+    if(s.tipe === 'PG'){
+      body = s.opsi.map(o => `
+        <label class="quiz-opt">
+          <input type="radio" name="q-${s.id}" value="${o.id}" data-action="jawab-pg" data-qid="${s.id}" ${b.quizAnswers[s.id]===o.id?'checked':''} />
+          ${escapeHtml(o.teks)}
+        </label>`).join('');
+    } else if(s.tipe === 'BS'){
+      body = ['benar','salah'].map(v => `
+        <label class="quiz-opt">
+          <input type="radio" name="q-${s.id}" value="${v}" data-action="jawab-pg" data-qid="${s.id}" ${b.quizAnswers[s.id]===v?'checked':''} />
+          ${v === 'benar' ? 'Benar' : 'Salah'}
+        </label>`).join('');
+    } else {
+      body = `<textarea rows="3" data-action-oninput="jawab-esai" data-qid="${s.id}" placeholder="Tulis jawaban Anda...">${escapeHtml(b.quizAnswers[s.id] || '')}</textarea>`;
+    }
+    return `
+      <div class="quiz-q">
+        <p style="font-weight:600; margin-bottom:10px;">${i+1}. ${escapeHtml(s.pertanyaan)} <span style="color:var(--muted-2); font-weight:400; font-size:12px;">(${s.poin} poin)</span></p>
+        ${body}
+      </div>`;
+  }).join('');
+
+  return `
+    <h2 class="section-title">Evaluasi</h2>
+    ${questions}
+    <button class="btn btn-primary" data-action="submit-evaluasi">Kumpulkan Jawaban</button>`;
+}
+
+/* ---------------- FLASH CARD ---------------- */
+function renderFlashcard(){
+  const isGuru = state.role === 'guru';
+  const b = state.builder;
+
+  if(b.activeDeckId){
+    const deck = state.flashcardDecks.find(d => d.id === b.activeDeckId);
+    if(!deck){ b.activeDeckId = null; return renderFlashcard(); }
+
+    const cardsHtml = deck.cards.map((c, idx) => `
+      <div class="fc-scene">
+        ${isGuru ? `<button class="del" data-action="hapus-card" data-idx="${idx}">✕</button>` : ''}
+        <div class="flip-scene" data-action="flip-card">
+          <div class="flip-inner">
+            <div class="flip-face front">${escapeHtml(c.depan)}</div>
+            <div class="flip-face back">${escapeHtml(c.belakang)}</div>
+          </div>
+        </div>
+      </div>`).join('');
+
+    const editorForm = !isGuru ? '' : `
+      <div class="card" style="margin-top:18px;">
+        <div class="row-2">
+          <div class="field">
+            <label class="field-label">Sisi Depan</label>
+            <input class="input" id="card-depan" placeholder="istilah / pertanyaan" />
+          </div>
+          <div class="field">
+            <label class="field-label">Sisi Belakang</label>
+            <input class="input" id="card-belakang" placeholder="jawaban / definisi" />
+          </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-primary" data-action="tambah-card">+ Tambah Kartu</button>
+          <button class="btn btn-outline" data-action="generate-card-ai">🤖 Generate dari Materi (AI)</button>
+        </div>
+      </div>`;
+
+    return `
+      <button class="btn btn-ghost" data-action="goto" data-menu="flashcard" data-clear-deck="1" style="padding-left:0; margin-bottom:10px;">← Kembali ke daftar deck</button>
+      <h2 class="section-title">${escapeHtml(deck.judul)}</h2>
+      <p class="section-desc">Klik kartu untuk membalik.</p>
+      <div class="fc-grid">${cardsHtml || '<p class="empty-note">Belum ada kartu.</p>'}</div>
+      ${editorForm}`;
+  }
+
+  const newDeckForm = !isGuru ? '' : `
+    <div class="card" style="margin-bottom:20px;">
+      <h3 class="section-title" style="font-size:15.5px;">Buat Deck Baru</h3>
+      <div class="field">
+        <label class="field-label">Judul (nama materi)</label>
+        <input class="input" id="deck-title" placeholder="contoh: Kosakata Bab 3" />
+      </div>
+      <button class="btn btn-primary" data-action="buat-deck">+ Buat Deck</button>
+    </div>`;
+
+  const deckList = state.flashcardDecks.map(d => `
+    <div class="list-item">
+      <div class="meta">
+        <div class="ico">🗂️</div>
+        <div>
+          <div class="title">${escapeHtml(d.judul)}</div>
+          <div class="sub">${d.cards.length} kartu</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-outline btn-sm" data-action="buka-deck" data-id="${d.id}">${isGuru ? 'Kelola' : 'Pelajari'}</button>
+        ${isGuru ? `<button class="btn btn-danger btn-sm" data-action="hapus-deck" data-id="${d.id}">Hapus</button>` : ''}
+      </div>
+    </div>`).join('');
+
+  return `
+    <h2 class="section-title">Flash Card</h2>
+    <p class="section-desc">${isGuru ? 'Buat & kelola deck flash card per materi.' : 'Pilih materi untuk mempelajari flash card.'}</p>
+    ${newDeckForm}
+    ${deckList || '<p class="empty-note">Belum ada deck flash card.</p>'}`;
+}
+
+/* ================================================================
+   HELPERS
+   ================================================================ */
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str ?? '';
+  return div.innerHTML;
+}
+function bulletize(text){
+  return (text || '').split('\n').map(l => l.trim()).filter(Boolean).map(l => `<li>${escapeHtml(l)}</li>`).join('');
+}
+
+function buildModulPreviewHtml(f){
+  return `
+    <h2>MODUL AJAR</h2>
+    <p class="sub">${escapeHtml(f.mapel || '-')} — Fase/Kelas ${escapeHtml(f.fase || '-')}</p>
+    <h4>A. Informasi Umum</h4>
+    <table>
+      <tr><td>Mata Pelajaran</td><td>${escapeHtml(f.mapel)}</td></tr>
+      <tr><td>Fase / Kelas</td><td>${escapeHtml(f.fase)}</td></tr>
+      <tr><td>Alokasi Waktu</td><td>${escapeHtml(f.alokasi)}</td></tr>
+      <tr><td>Target Peserta Didik</td><td>${escapeHtml(f.target)}</td></tr>
+      <tr><td>Model Pembelajaran</td><td>${escapeHtml(f.model)}</td></tr>
+      <tr><td>Moda Pembelajaran</td><td>${escapeHtml(f.moda)}</td></tr>
+    </table>
+    <h4>B. Kompetensi Awal</h4><p>${escapeHtml(f.kompetensiAwal)}</p>
+    <h4>C. Tujuan Pembelajaran</h4><ul>${bulletize(f.tujuan)}</ul>
+    <h4>D. Pemahaman Bermakna</h4><p>${escapeHtml(f.pemahaman)}</p>
+    <h4>E. Pertanyaan Pemantik</h4><ul>${bulletize(f.pertanyaanPemantik)}</ul>
+    <h4>F. Materi Pembelajaran</h4><p>${escapeHtml(f.materiInti)}</p>
+    <h4>G. Kegiatan Pembelajaran</h4>
+    <p><b>Pendahuluan:</b> ${escapeHtml(f.kegiatanPembuka)}</p>
+    <p><b>Inti:</b> ${escapeHtml(f.kegiatanInti)}</p>
+    <p><b>Penutup:</b> ${escapeHtml(f.kegiatanPenutup)}</p>
+    <h4>H. Asesmen</h4><p>${escapeHtml(f.asesmen)}</p>
+    <h4>I. Remedial & Pengayaan</h4><p>${escapeHtml(f.remedialPengayaan)}</p>`;
+}
+
+function downloadAsWordDoc(filename, innerHtml){
+  const full = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+    <head><meta charset="utf-8"><title>${filename}</title></head>
+    <body style="font-family:'Times New Roman',serif;">${innerHtml}</body></html>`;
+  const blob = new Blob(['\ufeff', full], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename.endsWith('.doc') ? filename : filename + '.doc';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+/* ================================================================
+   EVENT HANDLING — delegasi klik tunggal di <body>, dicocokkan lewat
+   atribut data-action. Pola ini meniru "controller" sederhana supaya
+   tidak perlu menambah listener baru di setiap render().
+   ================================================================ */
+document.addEventListener('click', (e) => {
+  const roleOpt = e.target.closest('.role-opt');
+  if(roleOpt){
+    state.loginRolePick = roleOpt.dataset.role;
+    document.querySelectorAll('.role-opt').forEach(el => el.classList.toggle('active', el === roleOpt));
+    return;
+  }
+
+  if(e.target.id === 'btn-login'){
+    const name = document.getElementById('login-name').value.trim();
+    state.role = state.loginRolePick;
+    state.userName = name || (state.role === 'guru' ? 'Bu Guru' : 'Siswa');
+    state.screen = 'app';
+    state.activeMenu = 'dashboard';
+    render();
+    return;
+  }
+
+  const target = e.target.closest('[data-action]');
+  if(!target) return;
+  const action = target.dataset.action;
+  const b = state.builder;
+
+  switch(action){
+    case 'goto':
+      state.activeMenu = target.dataset.menu;
+      if(target.dataset.clearDeck) b.activeDeckId = null;
+      render();
+      break;
+
+    case 'btn-logout':
+      break;
+
+    /* ---------- Materi ---------- */
+    case 'materi-mode':
+      b.materiMode = target.dataset.mode;
+      render();
+      break;
+    case 'upload-materi': {
+      const judul = document.getElementById('materi-judul').value.trim();
+      const mapel = document.getElementById('materi-mapel').value.trim();
+
+      if(b.materiMode === 'link'){
+        const link = document.getElementById('materi-link').value.trim();
+        if(!judul || !link){ showToast('Judul dan link wajib diisi'); return; }
+        let tipe = 'Link';
+        if(/youtube\.com|youtu\.be|vimeo\.com/i.test(link)) tipe = 'Video (Link)';
+        state.materiList.push({
+          id: nid(), judul, mapel: mapel || '-', fileName: link,
+          tipe, url: link, tanggal: today(),
+        });
+        showToast('Link materi berhasil disimpan');
+        render();
+        return;
+      }
+
+      const fileInput = document.getElementById('materi-file');
+      const file = fileInput.files[0];
+      if(!judul || !file){ showToast('Judul dan file wajib diisi'); return; }
+      state.materiList.push({
+        id: nid(), judul, mapel: mapel || '-', fileName: file.name,
+        tipe: file.type.startsWith('video') ? 'Video' : 'Dokumen',
+        url: URL.createObjectURL(file), tanggal: today(),
+      });
+      showToast('Materi berhasil diunggah');
+      render();
+      break;
+    }
+    case 'hapus-materi':
+      state.materiList = state.materiList.filter(m => m.id != target.dataset.id);
+      render();
+      break;
+    case 'open-file': {
+      const url = target.dataset.url;
+      if(url) window.open(url, '_blank');
+      else showToast('Pratinjau file (simulasi demo)');
+      break;
+    }
+    case 'generate-ppt-from-materi': {
+      const materiId = Number(target.dataset.id);
+      const materi = state.materiList.find(m => m.id === materiId);
+      showToast('Menggenerate presentasi dari materi...');
+      setTimeout(() => {
+        state.pptList.push({ id: nid(), judul: `Presentasi — ${materi.judul}`, materiId, status:'draft', tanggal: today() });
+        showToast('PowerPoint berhasil digenerate (draft)');
+        state.activeMenu = 'ppt';
+        render();
+      }, 900);
+      break;
+    }
+
+    /* ---------- Power Point ---------- */
+    case 'ppt-mode':
+      b.pptMode = target.dataset.mode;
+      render();
+      break;
+    case 'generate-ppt': {
+      if(b.pptMode === 'materi'){
+        const materiId = Number(document.getElementById('ppt-materi-select').value);
+        if(!materiId){ showToast('Pilih materi terlebih dahulu'); return; }
+        const materi = state.materiList.find(m => m.id === materiId);
+        showToast('Menggenerate presentasi...');
+        setTimeout(() => {
+          state.pptList.push({ id: nid(), judul:`Presentasi — ${materi.judul}`, materiId, status:'draft', tanggal: today() });
+          showToast('PowerPoint berhasil digenerate (draft)');
+          render();
+        }, 900);
+      } else {
+        const judul = document.getElementById('ppt-upload-judul').value.trim();
+        const file = document.getElementById('ppt-upload-file').files[0];
+        if(!judul || !file){ showToast('Judul dan file wajib diisi'); return; }
+        showToast('Menggenerate presentasi dari file eksternal...');
+        setTimeout(() => {
+          state.pptList.push({ id: nid(), judul, materiId: null, status:'draft', tanggal: today() });
+          showToast('PowerPoint berhasil digenerate (draft)');
+          render();
+        }, 900);
+      }
+      break;
+    }
+    case 'ppt-publish':
+      state.pptList.find(p => p.id == target.dataset.id).status = 'published';
+      showToast('PowerPoint ditampilkan ke siswa');
+      render(); break;
+    case 'ppt-unpublish':
+      state.pptList.find(p => p.id == target.dataset.id).status = 'draft';
+      showToast('Upload dibatalkan, kembali ke draft');
+      render(); break;
+    case 'hapus-ppt':
+      state.pptList = state.pptList.filter(p => p.id != target.dataset.id);
+      render(); break;
+
+    /* ---------- Modul Ajar ---------- */
+    case 'generate-modul': {
+      const f = b.modul;
+      ['mapel','fase','alokasi','target','model','moda','kompetensiAwal','tujuan','pemahaman',
+       'pertanyaanPemantik','materiInti','kegiatanPembuka','kegiatanInti','kegiatanPenutup',
+       'asesmen','remedialPengayaan'].forEach(k => {
+        const el = document.getElementById('mod-' + k);
+        if(el) f[k] = el.value;
+      });
+      b.modulPreviewHtml = buildModulPreviewHtml(f);
+      showToast('Pratinjau modul ajar berhasil dibuat');
+      render();
+      break;
+    }
+    case 'download-modul-draft':
+      downloadAsWordDoc(`Modul Ajar - ${b.modul.mapel || 'Draft'}`, b.modulPreviewHtml);
+      break;
+    case 'simpan-publish-modul':
+      state.modulList.push({ id: nid(), data: { ...b.modul }, html: b.modulPreviewHtml, status:'published', tanggal: today() });
+      showToast('Modul ajar disimpan & diterbitkan ke siswa');
+      b.modul = defaultModulForm();
+      b.modulPreviewHtml = null;
+      render();
+      break;
+    case 'download-modul': {
+      const m = state.modulList.find(x => x.id == target.dataset.id);
+      downloadAsWordDoc(`Modul Ajar - ${m.data.mapel || 'Modul'}`, m.html);
+      break;
+    }
+    case 'publish-modul':
+      state.modulList.find(m => m.id == target.dataset.id).status = 'published';
+      render(); break;
+    case 'unpublish-modul':
+      state.modulList.find(m => m.id == target.dataset.id).status = 'draft';
+      render(); break;
+    case 'hapus-modul':
+      state.modulList = state.modulList.filter(m => m.id != target.dataset.id);
+      render(); break;
+
+    /* ---------- Evaluasi — guru ---------- */
+    case 'eval-tab':
+      b.evalTab = target.dataset.tab;
+      render(); break;
+    case 'tambah-opsi':
+      b.soalForm.opsi.push({ id: 'o' + nid(), teks:'' });
+      render(); break;
+    case 'hapus-opsi':
+      b.soalForm.opsi = b.soalForm.opsi.filter(o => o.id !== target.dataset.opsiId);
+      render(); break;
+    case 'simpan-soal': {
+      const f = b.soalForm;
+      const pertanyaan = document.getElementById('soal-pertanyaan').value.trim();
+      const poin = Number(document.getElementById('soal-poin').value) || 10;
+      if(!pertanyaan){ showToast('Pertanyaan wajib diisi'); return; }
+      if(f.tipe === 'ESAI') f.kunci = document.getElementById('soal-kunci-esai').value.trim();
+      if(f.tipe === 'PG' && !f.kunci){ showToast('Pilih kunci jawaban terlebih dahulu'); return; }
+      state.soalBank.push({
+        id: nid(), tipe: f.tipe, pertanyaan, poin,
+        opsi: f.tipe === 'PG' ? f.opsi.map(o => ({ ...o })) : null,
+        kunci: f.kunci,
+      });
+      b.soalForm = { tipe:'PG', pertanyaan:'', opsi:[{id:'n'+nid(),teks:''},{id:'n'+nid(),teks:''}], kunci:null, poin:10 };
+      showToast('Soal berhasil disimpan');
+      render();
+      break;
+    }
+    case 'hapus-soal':
+      state.soalBank = state.soalBank.filter(s => s.id != target.dataset.id);
+      render(); break;
+    case 'generate-soal-ai': {
+      const materiId = Number(document.getElementById('ai-materi-select').value);
+      if(!materiId){ showToast('Pilih materi terlebih dahulu'); return; }
+      const materi = state.materiList.find(m => m.id === materiId);
+      showToast('Menghubungkan ke server AI...');
+      setTimeout(() => {
+        state.soalBank.push({
+          id: nid(), tipe:'PG',
+          pertanyaan: `Berdasarkan materi "${materi.judul}", manakah pernyataan yang paling tepat?`,
+          opsi: [{id:'g1',teks:'Pernyataan A (benar)'},{id:'g2',teks:'Pernyataan B'},{id:'g3',teks:'Pernyataan C'},{id:'g4',teks:'Pernyataan D'}],
+          kunci:'g1', poin:10,
+        });
+        showToast('1 soal baru berhasil digenerate AI');
+        render();
+      }, 1100);
+      break;
+    }
+
+    /* ---------- Evaluasi — siswa ---------- */
+    case 'mulai-evaluasi':
+      b.quizStarted = true; b.quizAnswers = {}; render(); break;
+    case 'submit-evaluasi': {
+      let skorDiperoleh = 0, skorMaks = 0;
+      state.soalBank.forEach(s => {
+        skorMaks += s.poin;
+        if(s.tipe === 'ESAI') return; // dinilai manual
+        if(b.quizAnswers[s.id] && String(b.quizAnswers[s.id]).toLowerCase() === String(s.kunci).toLowerCase()){
+          skorDiperoleh += s.poin;
+        }
+      });
+      const skor = skorMaks ? Math.round((skorDiperoleh / skorMaks) * 100) : 0;
+      state.rekapNilai.push({ nama: state.userName, nilai: skor, tanggal: today() });
+      b.quizSubmitted = { skor, maksimal: 100 };
+      b.quizStarted = false;
+      render();
+      break;
+    }
+    case 'ulangi-evaluasi':
+      b.quizSubmitted = null; render(); break;
+
+    /* ---------- Flash Card ---------- */
+    case 'buat-deck': {
+      const judul = document.getElementById('deck-title').value.trim();
+      if(!judul){ showToast('Judul deck wajib diisi'); return; }
+      const d = { id: nid(), judul, cards: [] };
+      state.flashcardDecks.push(d);
+      b.activeDeckId = d.id;
+      render();
+      break;
+    }
+    case 'buka-deck':
+      b.activeDeckId = Number(target.dataset.id);
+      render(); break;
+    case 'hapus-deck':
+      state.flashcardDecks = state.flashcardDecks.filter(d => d.id != target.dataset.id);
+      render(); break;
+    case 'flip-card':
+      target.classList.toggle('is-flipped');
+      break;
+    case 'tambah-card': {
+      const depan = document.getElementById('card-depan').value.trim();
+      const belakang = document.getElementById('card-belakang').value.trim();
+      if(!depan || !belakang){ showToast('Isi kedua sisi kartu'); return; }
+      state.flashcardDecks.find(d => d.id === b.activeDeckId).cards.push({ depan, belakang });
+      render();
+      break;
+    }
+    case 'hapus-card': {
+      const deck = state.flashcardDecks.find(d => d.id === b.activeDeckId);
+      deck.cards.splice(Number(target.dataset.idx), 1);
+      render();
+      break;
+    }
+    case 'generate-card-ai': {
+      const deck = state.flashcardDecks.find(d => d.id === b.activeDeckId);
+      showToast('Menghubungkan ke server AI...');
+      setTimeout(() => {
+        deck.cards.push(
+          { depan:`Istilah kunci #${deck.cards.length+1}`, belakang:`Definisi otomatis terkait "${deck.judul}"` },
+          { depan:`Istilah kunci #${deck.cards.length+2}`, belakang:`Definisi otomatis terkait "${deck.judul}"` },
+        );
+        showToast('2 kartu baru digenerate AI');
+        render();
+      }, 1000);
+      break;
+    }
+  }
+});
+
+/* ---------- input/change listener (delegasi) untuk field dinamis ---------- */
+document.addEventListener('input', (e) => {
+  const el = e.target;
+  const b = state.builder;
+  if(el.dataset.actionOninput === 'opsi-text'){
+    const o = b.soalForm.opsi.find(x => x.id === el.dataset.opsiId);
+    if(o) o.teks = el.value;
+  }
+  if(el.dataset.actionOninput === 'jawab-esai'){
+    b.quizAnswers[el.dataset.qid] = el.value;
+  }
+});
+document.addEventListener('change', (e) => {
+  const el = e.target;
+  const b = state.builder;
+  if(el.id === 'soal-tipe'){
+    b.soalForm.tipe = el.value;
+    render();
+  }
+  if(el.dataset.action === 'pilih-kunci-pg'){ b.soalForm.kunci = el.value; }
+  if(el.dataset.action === 'pilih-kunci-bs'){ b.soalForm.kunci = el.value; }
+  if(el.dataset.action === 'jawab-pg'){ b.quizAnswers[el.dataset.qid] = el.value; }
+});
+
+/* ---------- drag & drop reorder opsi jawaban (PG) ---------- */
+document.addEventListener('dragstart', (e) => {
+  const row = e.target.closest('.opsi-row');
+  if(!row) return;
+  row.classList.add('dragging');
+  e.dataTransfer.setData('text/plain', row.dataset.opsiId);
+});
+document.addEventListener('dragend', (e) => {
+  const row = e.target.closest('.opsi-row');
+  if(row) row.classList.remove('dragging');
+});
+document.addEventListener('dragover', (e) => {
+  const list = document.getElementById('opsi-list');
+  if(!list || !list.contains(e.target)) return;
+  e.preventDefault();
+  const dragging = list.querySelector('.dragging');
+  const after = [...list.querySelectorAll('.opsi-row:not(.dragging)')].find(row => e.clientY < row.getBoundingClientRect().top + row.offsetHeight / 2);
+  if(dragging){
+    if(after) list.insertBefore(dragging, after);
+    else list.appendChild(dragging);
+  }
+});
+document.addEventListener('drop', (e) => {
+  const list = document.getElementById('opsi-list');
+  if(!list || !list.contains(e.target) && e.target.id !== 'opsi-list') return;
+  // Setelah drop, sinkronkan urutan DOM -> state.builder.soalForm.opsi
+  const ids = [...list.querySelectorAll('.opsi-row')].map(r => r.dataset.opsiId);
+  const opsiMap = Object.fromEntries(state.builder.soalForm.opsi.map(o => [o.id, o]));
+  state.builder.soalForm.opsi = ids.map(id => opsiMap[id]).filter(Boolean);
+});
+
+document.getElementById('btn-logout').addEventListener('click', () => {
+  state.screen = 'login';
+  state.role = null;
+  state.activeMenu = 'dashboard';
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
